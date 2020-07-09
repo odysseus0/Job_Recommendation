@@ -21,16 +21,6 @@
         </plugin>
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
-          <configuration>
-            <release>11</release>
-            <annotationProcessorPaths>
-              <path>
-                <artifactId>lombok</artifactId>
-                <groupId>org.projectlombok</groupId>
-                <version>1.18.12</version>
-              </path>
-            </annotationProcessorPaths>
-          </configuration>
           <version>3.8.0</version>
         </plugin>
         <plugin>
@@ -73,6 +63,11 @@
       <artifactId>httpclient</artifactId>
       <groupId>org.apache.httpcomponents</groupId>
       <version>4.5.10</version>
+    </dependency>
+    <dependency>
+      <artifactId>lombok</artifactId>
+      <groupId>org.projectlombok</groupId>
+      <version>1.18.12</version>
     </dependency>
   </dependencies>
   <groupId>laiproject</groupId>
