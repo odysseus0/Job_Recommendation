@@ -23,6 +23,13 @@
           <artifactId>maven-compiler-plugin</artifactId>
           <configuration>
             <release>11</release>
+            <annotationProcessorPaths>
+              <path>
+                <artifactId>lombok</artifactId>
+                <groupId>org.projectlombok</groupId>
+                <version>1.18.12</version>
+              </path>
+            </annotationProcessorPaths>
           </configuration>
           <version>3.8.0</version>
         </plugin>
