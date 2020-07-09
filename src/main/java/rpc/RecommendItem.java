@@ -1,5 +1,7 @@
 package rpc;
 
+import static rpc.RpcHelper.writeJsonArray;
+
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -26,11 +28,11 @@ public class RecommendItem extends HttpServlet {
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
     JSONArray array = new JSONArray();
-    array.put(new JSONObject().put("name", "abcd").put("address", "San Francisco")
+    array.put(new JSONObject().put("name", "abc").put("address", "San Francisco")
         .put("time", "01/01/2017"));
     array.put(
         new JSONObject().put("name", "1234").put("address", "San Jose").put("time", "01/01/2017"));
-    RpcHelper.writeJsonArray(response, array);
+    writeJsonArray(response, array);
   }
 
   /**

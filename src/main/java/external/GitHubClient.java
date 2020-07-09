@@ -1,7 +1,8 @@
 package external;
 
+import static java.net.URLEncoder.encode;
+
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ResponseHandler;
@@ -21,7 +22,7 @@ public class GitHubClient {
     if (keyword == null) {
       keyword = DEFAULT_KEYWORD;
     }
-    keyword = URLEncoder.encode(keyword, StandardCharsets.UTF_8);
+    keyword = encode(keyword, StandardCharsets.UTF_8);
     String url = String.format(URL_TEMPLATE, keyword, lat, lon);
     CloseableHttpClient httpClient = HttpClients.createDefault();
 
