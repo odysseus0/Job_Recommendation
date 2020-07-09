@@ -2,8 +2,11 @@ package external;
 
 import static java.net.URLEncoder.encode;
 
+import entity.Item;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpGet;
@@ -11,6 +14,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class GitHubClient {
 
@@ -18,7 +22,7 @@ public class GitHubClient {
       "https://jobs.github.com/positions.json?description=%s&lat=%s&long=%s";
   private static final String DEFAULT_KEYWORD = "developer";
 
-  public JSONArray search(double lat, double lon, String keyword) {
+  public List<Item> search(double lat, double lon, String keyword) {
     if (keyword == null) {
       keyword = DEFAULT_KEYWORD;
     }
@@ -27,15 +31,17 @@ public class GitHubClient {
     CloseableHttpClient httpClient = HttpClients.createDefault();
 
     // Create a custom response handler
-    ResponseHandler<JSONArray> responseHandler = response -> {
+    ResponseHandler<List<Item>> responseHandler = response -> {
       if (response.getStatusLine().getStatusCode() != 200) {
-        return new JSONArray();
+        return new ArrayList<>();
       }
       HttpEntity entity = response.getEntity();
       if (entity == null) {
-        return new JSONArray();
+        return new ArrayList<>();
       }
-      return new JSONArray(EntityUtils.toString(entity));
+      String responseBody = EntityUtils.toString(entity);
+      JSONArray array = new JSONArray(responseBody);
+      return getItemList(array);
     };
 
     try {
@@ -44,6 +50,26 @@ public class GitHubClient {
       e.printStackTrace();
     }
 
-    return new JSONArray();
+    return new ArrayList<>();
+  }
+
+  private List<Item> getItemList(JSONArray array) {
+    List<Item> itemList = new ArrayList<>();
+    for (int i = 0; i < array.length(); i++) {
+      JSONObject object = array.getJSONObject(i);
+      Item item = Item.builder()
+          .itemId(getStringFieldOrEmpty(object, "id"))
+          .name(getStringFieldOrEmpty(object, "title"))
+          .address(getStringFieldOrEmpty(object, "location"))
+          .url(getStringFieldOrEmpty(object, "url"))
+          .imageUrl(getStringFieldOrEmpty(object, "company_logo"))
+          .build();
+      itemList.add(item);
+    }
+    return itemList;
+  }
+
+  private String getStringFieldOrEmpty(JSONObject obj, String field) {
+    return obj.isNull(field) ? "" : obj.getString(field);
   }
 }

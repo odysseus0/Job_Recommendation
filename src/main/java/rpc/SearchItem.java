@@ -1,11 +1,14 @@
 package rpc;
 
+import entity.Item;
 import external.GitHubClient;
 import java.io.IOException;
+import java.util.List;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.json.JSONArray;
 
 @WebServlet(name = "SearchItem", urlPatterns = {"/search"})
 public class SearchItem extends HttpServlet {
@@ -28,8 +31,12 @@ public class SearchItem extends HttpServlet {
     double lon = Double.parseDouble(request.getParameter("lon"));
 
     GitHubClient client = new GitHubClient();
-    RpcHelper.writeJsonArray(response, client.search(lat, lon, null));
-
+    List<Item> items = client.search(lat, lon, null);
+    JSONArray array = new JSONArray();
+    for (Item item : items) {
+      array.put(item.toJSONObject());
+    }
+    RpcHelper.writeJsonArray(response, array);
   }
 
   /**
