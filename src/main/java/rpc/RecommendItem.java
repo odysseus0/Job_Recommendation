@@ -1,14 +1,14 @@
 package rpc;
 
-import static rpc.RpcHelper.writeJsonArray;
+import static rpc.RpcHelper.writeJsonNode;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 @WebServlet(name = "RecommendItem", urlPatterns = {"/recommend"})
 public class RecommendItem extends HttpServlet {
@@ -27,12 +27,13 @@ public class RecommendItem extends HttpServlet {
    */
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
-    JSONArray array = new JSONArray();
-    array.put(new JSONObject().put("name", "abc").put("address", "San Francisco")
+    ObjectMapper objectMapper = new ObjectMapper();
+    ArrayNode array = objectMapper.createArrayNode();
+    array.add(objectMapper.createObjectNode().put("name", "abc").put("address", "San Francisco")
         .put("time", "01/01/2017"));
-    array.put(
-        new JSONObject().put("name", "1234").put("address", "San Jose").put("time", "01/01/2017"));
-    writeJsonArray(response, array);
+    array.add(objectMapper.createObjectNode().put("name", "1234").put("address", "San Jose")
+        .put("time", "01/01/2017"));
+    writeJsonNode(response, array);
   }
 
   /**

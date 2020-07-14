@@ -1,5 +1,8 @@
 package rpc;
 
+import static rpc.RpcHelper.writeJsonNode;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import entity.Item;
 import external.GitHubClient;
 import java.io.IOException;
@@ -8,7 +11,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.json.JSONArray;
 
 @WebServlet(name = "SearchItem", urlPatterns = {"/search"})
 public class SearchItem extends HttpServlet {
@@ -32,11 +34,8 @@ public class SearchItem extends HttpServlet {
 
     GitHubClient client = new GitHubClient();
     List<Item> items = client.search(lat, lon, null);
-    JSONArray array = new JSONArray();
-    for (Item item : items) {
-      array.put(item.toJSONObject());
-    }
-    RpcHelper.writeJsonArray(response, array);
+    ObjectMapper mapper = new ObjectMapper();
+    writeJsonNode(response, mapper.valueToTree(items));
   }
 
   /**

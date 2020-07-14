@@ -1,31 +1,35 @@
 package entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
 import java.util.Set;
 import lombok.Builder;
-import lombok.Getter;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import lombok.Value;
 
-@Getter
-@Builder
+@Value
+@Builder(builderClassName = "ItemBuilder")
+@JsonInclude(Include.NON_NULL)
+@JsonDeserialize(builder = Item.ItemBuilder.class)
 public class Item {
 
-  private final String itemId;
-  private final String name;
-  private final String address;
-  private final Set<String> keywords;
-  private final String imageUrl;
-  private final String url;
+  @JsonProperty("id")
+  String itemId;
+  @JsonProperty("title")
+  String name;
+  @JsonProperty("location")
+  String address;
+  Set<String> keywords;
+  @JsonProperty("company_logo")
+  String imageUrl;
+  String url;
 
-  public JSONObject toJSONObject() {
-    JSONObject object = new JSONObject();
+  @JsonPOJOBuilder(withPrefix = "")
+  @JsonIgnoreProperties(ignoreUnknown = true)
+  public static class ItemBuilder {
 
-    object.put("item_id", itemId);
-    object.put("name", name);
-    object.put("address", address);
-    object.put("keywords", new JSONArray(keywords));
-    object.put("image_url", imageUrl);
-    object.put("url", url);
-    return object;
   }
 }

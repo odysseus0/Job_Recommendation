@@ -2,6 +2,8 @@ package external;
 
 import static java.net.URLEncoder.encode;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import entity.Item;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -13,8 +15,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 public class GitHubClient {
 
@@ -40,8 +40,9 @@ public class GitHubClient {
         return new ArrayList<>();
       }
       String responseBody = EntityUtils.toString(entity);
-      JSONArray array = new JSONArray(responseBody);
-      return getItemList(array);
+      ObjectMapper objectMapper = new ObjectMapper();
+      return objectMapper.readValue(responseBody, new TypeReference<>() {
+      });
     };
 
     try {
@@ -51,25 +52,5 @@ public class GitHubClient {
     }
 
     return new ArrayList<>();
-  }
-
-  private List<Item> getItemList(JSONArray array) {
-    List<Item> itemList = new ArrayList<>();
-    for (int i = 0; i < array.length(); i++) {
-      JSONObject object = array.getJSONObject(i);
-      Item item = Item.builder()
-          .itemId(getStringFieldOrEmpty(object, "id"))
-          .name(getStringFieldOrEmpty(object, "title"))
-          .address(getStringFieldOrEmpty(object, "location"))
-          .url(getStringFieldOrEmpty(object, "url"))
-          .imageUrl(getStringFieldOrEmpty(object, "company_logo"))
-          .build();
-      itemList.add(item);
-    }
-    return itemList;
-  }
-
-  private String getStringFieldOrEmpty(JSONObject obj, String field) {
-    return obj.isNull(field) ? "" : obj.getString(field);
   }
 }

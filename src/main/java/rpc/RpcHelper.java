@@ -1,22 +1,15 @@
 package rpc;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import java.io.IOException;
 import javax.servlet.http.HttpServletResponse;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 public class RpcHelper {
 
-  public static void writeJsonArray(HttpServletResponse response, JSONArray array)
+  // Writes a JSONNode to http response.
+  public static void writeJsonNode(HttpServletResponse response, JsonNode node)
       throws IOException {
     response.setContentType("application/json");
-    response.getWriter().print(array);
-  }
-
-  // Writes a JSONObject to http response.
-  public static void writeJsonObject(HttpServletResponse response, JSONObject obj)
-      throws IOException {
-    response.setContentType("application/json");
-    response.getWriter().print(obj);
+    response.getWriter().print(node);
   }
 }
