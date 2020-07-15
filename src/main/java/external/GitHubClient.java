@@ -2,19 +2,15 @@ package external;
 
 import static java.net.URLEncoder.encode;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import entity.Item;
 import java.io.IOException;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import org.apache.http.HttpEntity;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 
 public class GitHubClient {
 
@@ -28,29 +24,52 @@ public class GitHubClient {
     }
     keyword = encode(keyword, StandardCharsets.UTF_8);
     String url = String.format(URL_TEMPLATE, keyword, lat, lon);
-    CloseableHttpClient httpClient = HttpClients.createDefault();
-
-    // Create a custom response handler
-    ResponseHandler<List<Item>> responseHandler = response -> {
-      if (response.getStatusLine().getStatusCode() != 200) {
-        return new ArrayList<>();
-      }
-      HttpEntity entity = response.getEntity();
-      if (entity == null) {
-        return new ArrayList<>();
-      }
-      String responseBody = EntityUtils.toString(entity);
-      ObjectMapper objectMapper = new ObjectMapper();
-      return objectMapper.readValue(responseBody, new TypeReference<>() {
-      });
-    };
-
+    ObjectMapper objectMapper = new ObjectMapper();
     try {
-      return httpClient.execute(new HttpGet(url), responseHandler);
+      JsonNode array = objectMapper.readTree(new URL(url));
+      return getItemList(array);
     } catch (IOException e) {
-      e.printStackTrace();
+      return new ArrayList<>();
+    }
+  }
+
+  private List<Item> getItemList(JsonNode array) {
+    List<Item> itemList = new ArrayList<>();
+    List<String> descriptionList = new ArrayList<>();
+
+    for (JsonNode jsonNode : array) {
+      // We need to extract keywords from description since GitHub API
+      // doesn't return keywords.
+      String description = getStringFieldOrEmpty(jsonNode, "description");
+      if (description.equals("") || description.equals("\n")) {
+        descriptionList.add(getStringFieldOrEmpty(jsonNode, "title"));
+      } else {
+        descriptionList.add(description);
+      }
     }
 
-    return new ArrayList<>();
+    // We need to get keywords from multiple text in one request since
+    // MonkeyLearnAPI has limitations on request per minute.
+    List<List<String>> keywords = MonkeyLearnClient
+        .extractKeywords(descriptionList.toArray(new String[0]));
+
+    for (int i = 0; i < array.size(); i++) {
+      JsonNode object = array.get(i);
+      Item item = Item.builder()
+          .itemId(getStringFieldOrEmpty(object, "id"))
+          .name(getStringFieldOrEmpty(object, "title"))
+          .address(getStringFieldOrEmpty(object, "location"))
+          .url(getStringFieldOrEmpty(object, "url"))
+          .imageUrl(getStringFieldOrEmpty(object, "company_logo"))
+          .keywords(new HashSet<>(keywords.get(i)))
+          .build();
+      itemList.add(item);
+    }
+
+    return itemList;
+  }
+
+  private String getStringFieldOrEmpty(JsonNode node, String field) {
+    return node.hasNonNull(field) ? node.get(field).textValue() : "";
   }
 }
