@@ -36,12 +36,12 @@ class ItemTest {
   @Test
   void deserializeUnknownProperties() throws JsonProcessingException {
     ObjectNode node = JsonNodeFactory.instance.objectNode();
-    node.put("itemId", "123");
-    node.put("name", "Jesus");
+    node.put("id", "123");
+    node.put("title", "God");
     node.put("randomShit", "shit");
 
     Item result = mapper.readValue(node.toString(), Item.class);
-    Item expected = Item.builder().itemId("123").name("Jesus").build();
+    Item expected = Item.builder().itemId("123").name("God").build();
     assertEquals(result.toString(), expected.toString());
   }
 
