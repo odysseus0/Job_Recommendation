@@ -17,6 +17,8 @@ class ItemTest {
   private Item item;
   private List<Item> items;
   private ObjectMapper mapper;
+  private ObjectNode sampleJson;
+  private Item sampleItem;
 
   @BeforeEach
   void setUp() {
@@ -24,25 +26,24 @@ class ItemTest {
     mapper = new ObjectMapper();
     items = new ArrayList<>();
     items.addAll(List.of(item, item));
+    sampleJson = JsonNodeFactory.instance.objectNode();
+    sampleJson.put("id", "123");
+    sampleJson.put("title", "God");
+    sampleJson.put("randomShit", "shit");
+    sampleItem = Item.builder().itemId("123").name("God").build();
   }
 
   @Test
   void whenSerializeAndDeserializeUsingJackson_thenCorrect() throws JsonProcessingException {
     String jsonStr = mapper.writeValueAsString(item);
     Item result = mapper.readValue(jsonStr, Item.class);
-    assertEquals(item.toString(), result.toString());
+    assertEquals(item, result);
   }
 
   @Test
   void deserializeUnknownProperties() throws JsonProcessingException {
-    ObjectNode node = JsonNodeFactory.instance.objectNode();
-    node.put("id", "123");
-    node.put("title", "God");
-    node.put("randomShit", "shit");
-
-    Item result = mapper.readValue(node.toString(), Item.class);
-    Item expected = Item.builder().itemId("123").name("God").build();
-    assertEquals(result.toString(), expected.toString());
+    Item result = mapper.readValue(sampleJson.toString(), Item.class);
+    assertEquals(result, sampleItem);
   }
 
   @Test
@@ -51,5 +52,11 @@ class ItemTest {
     expected.add(mapper.valueToTree(item));
     expected.add(mapper.valueToTree(item));
     assertEquals(expected, mapper.valueToTree(items));
+  }
+
+  @Test
+  void deserializeIntoBuilder() throws JsonProcessingException {
+    Item item = mapper.readValue(sampleJson.toString(), Item.ItemBuilder.class).build();
+    assertEquals(item, sampleItem);
   }
 }

@@ -2,15 +2,18 @@ package external;
 
 import static java.net.URLEncoder.encode;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import entity.Item;
+import entity.Item.ItemBuilder;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
 public class GitHubClient {
 
@@ -24,9 +27,8 @@ public class GitHubClient {
     }
     keyword = encode(keyword, StandardCharsets.UTF_8);
     String url = String.format(URL_TEMPLATE, keyword, lat, lon);
-    ObjectMapper objectMapper = new ObjectMapper();
     try {
-      JsonNode array = objectMapper.readTree(new URL(url));
+      JsonNode array = new ObjectMapper().readTree(new URL(url));
       return getItemList(array);
     } catch (IOException e) {
       return new ArrayList<>();
@@ -41,7 +43,7 @@ public class GitHubClient {
       // We need to extract keywords from description since GitHub API
       // doesn't return keywords.
       String description = getStringFieldOrEmpty(jsonNode, "description");
-      if (description.equals("") || description.equals("\n")) {
+      if (description.isBlank()) {
         descriptionList.add(getStringFieldOrEmpty(jsonNode, "title"));
       } else {
         descriptionList.add(description);
@@ -54,22 +56,15 @@ public class GitHubClient {
         .extractKeywords(descriptionList.toArray(new String[0]));
 
     for (int i = 0; i < array.size(); i++) {
-      JsonNode object = array.get(i);
-      Item item = Item.builder()
-          .itemId(getStringFieldOrEmpty(object, "id"))
-          .name(getStringFieldOrEmpty(object, "title"))
-          .address(getStringFieldOrEmpty(object, "location"))
-          .url(getStringFieldOrEmpty(object, "url"))
-          .imageUrl(getStringFieldOrEmpty(object, "company_logo"))
-          .keywords(new HashSet<>(keywords.get(i)))
-          .build();
-      itemList.add(item);
+      try {
+        ItemBuilder builder = new ObjectMapper().treeToValue(array.get(i), Item.ItemBuilder.class);
+        itemList.add(builder.keywords(new HashSet<>(keywords.get(i))).build());
+      } catch (JsonProcessingException ignored) {
+      }
     }
-
     return itemList;
   }
-
   private String getStringFieldOrEmpty(JsonNode node, String field) {
-    return node.hasNonNull(field) ? node.get(field).textValue() : "";
+    return Objects.toString(node.get(field), "");
   }
 }
