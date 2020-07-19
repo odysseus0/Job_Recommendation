@@ -6,7 +6,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import entity.Item;
-import entity.Item.ItemBuilder;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -54,11 +53,12 @@ public class GitHubClient {
     // MonkeyLearnAPI has limitations on request per minute.
     List<List<String>> keywords = MonkeyLearnClient
         .extractKeywords(descriptionList.toArray(new String[0]));
-
+    ObjectMapper mapper = new ObjectMapper();
     for (int i = 0; i < array.size(); i++) {
       try {
-        ItemBuilder builder = new ObjectMapper().treeToValue(array.get(i), Item.ItemBuilder.class);
-        itemList.add(builder.keywords(new HashSet<>(keywords.get(i))).build());
+        Item item = mapper.treeToValue(array.get(i), Item.class);
+        item.setKeywords(new HashSet<>(keywords.get(i)));
+        itemList.add(item);
       } catch (JsonProcessingException ignored) {
       }
     }

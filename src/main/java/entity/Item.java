@@ -1,35 +1,32 @@
 package entity;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonPOJOBuilder;
+import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
+import java.util.HashSet;
 import java.util.Set;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Value;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Value
-@Builder(builderClassName = "ItemBuilder")
-@JsonInclude(Include.NON_NULL)
-@JsonDeserialize(builder = Item.ItemBuilder.class)
+@Data
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class Item {
 
-  @JsonProperty("id")
+  @JsonAlias({"id"})
   String itemId;
-  @JsonProperty("title")
+  @JsonAlias({"title"})
   String name;
-  @JsonProperty("location")
+  @JsonAlias({"location"})
   String address;
-  Set<String> keywords;
-  @JsonProperty("company_logo")
+  Set<String> keywords = new HashSet<>();
+  @JsonAlias({"company_logo"})
   String imageUrl;
   String url;
-
-  @JsonPOJOBuilder(withPrefix = "")
-  @JsonIgnoreProperties(ignoreUnknown = true)
-  public static class ItemBuilder {
-
-  }
 }
