@@ -17,7 +17,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet(name = "SearchItem", urlPatterns = {"/search"})
+@WebServlet(
+    name = "SearchItem",
+    urlPatterns = {"/search"})
 public class SearchItem extends HttpServlet {
 
   private static final long serialVersionUID = 1L;
@@ -29,9 +31,7 @@ public class SearchItem extends HttpServlet {
     super();
   }
 
-  /**
-   * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-   */
+  /** @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response) */
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
     String userId = request.getParameter("user_id");
@@ -54,12 +54,9 @@ public class SearchItem extends HttpServlet {
     writeJsonNode(response, array);
   }
 
-  /**
-   * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-   */
+  /** @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response) */
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
     doGet(request, response);
   }
-
 }

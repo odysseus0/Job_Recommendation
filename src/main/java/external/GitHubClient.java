@@ -51,8 +51,8 @@ public class GitHubClient {
 
     // We need to get keywords from multiple text in one request since
     // MonkeyLearnAPI has limitations on request per minute.
-    List<List<String>> keywords = MonkeyLearnClient
-        .extractKeywords(descriptionList.toArray(new String[0]));
+    List<List<String>> keywords =
+        MonkeyLearnClient.extractKeywords(descriptionList.toArray(new String[0]));
     ObjectMapper mapper = new ObjectMapper();
     for (int i = 0; i < array.size(); i++) {
       try {
@@ -64,6 +64,7 @@ public class GitHubClient {
     }
     return itemList;
   }
+
   private String getStringFieldOrEmpty(JsonNode node, String field) {
     return Objects.toString(node.get(field), "");
   }

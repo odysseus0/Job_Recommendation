@@ -131,14 +131,15 @@ public class MySQLConnection {
         statement.setString(1, itemId);
         ResultSet rs = statement.executeQuery();
         if (rs.next()) {
-          favoriteItems.add(Item.builder()
-              .itemId(rs.getString("item_id"))
-              .name(rs.getString("name"))
-              .address(rs.getString("address"))
-              .imageUrl(rs.getString("image_url"))
-              .url(rs.getString("url"))
-              .keywords(getKeywords(itemId))
-              .build());
+          favoriteItems.add(
+              Item.builder()
+                  .itemId(rs.getString("item_id"))
+                  .name(rs.getString("name"))
+                  .address(rs.getString("address"))
+                  .imageUrl(rs.getString("image_url"))
+                  .url(rs.getString("url"))
+                  .keywords(getKeywords(itemId))
+                  .build());
         }
       }
     } catch (SQLException e) {

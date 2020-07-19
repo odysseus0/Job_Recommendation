@@ -17,11 +17,13 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet(name = "ItemHistory", urlPatterns = {"/history"})
+@WebServlet(
+    name = "ItemHistory",
+    urlPatterns = {"/history"})
 public class ItemHistory extends HttpServlet {
 
-  protected void doPost(HttpServletRequest request,
-      HttpServletResponse response) throws IOException {
+  protected void doPost(HttpServletRequest request, HttpServletResponse response)
+      throws IOException {
     // Parse the favorite item from the input
     JsonNode input = new ObjectMapper().readTree(request.getReader());
     String userId = input.get("user_id").textValue();
@@ -34,12 +36,10 @@ public class ItemHistory extends HttpServlet {
   }
 
   private void writeSuccessMsg(HttpServletResponse response) throws IOException {
-    writeJsonNode(response,
-        JsonNodeFactory.instance.objectNode().put("result", "SUCCESS"));
+    writeJsonNode(response, JsonNodeFactory.instance.objectNode().put("result", "SUCCESS"));
   }
 
-  protected void doGet(HttpServletRequest request,
-      HttpServletResponse response)
+  protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
     String userId = request.getParameter("user_id");
     MySQLConnection connection = new MySQLConnection();

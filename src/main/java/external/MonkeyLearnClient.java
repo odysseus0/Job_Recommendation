@@ -43,10 +43,10 @@ public class MonkeyLearnClient {
     ExtraParam[] extraParams = {new ExtraParam("max_keywords", "3")};
     MonkeyLearnResponse response;
     try {
-      response = ml.extractors.extract(MODEL_ID, text, extraParams);//change to your model id
+      response = ml.extractors.extract(MODEL_ID, text, extraParams); // change to your model id
       JSONArray resultArray = response.arrayResult;
       return getKeywords(resultArray);
-    } catch (MonkeyLearnException e) {// it’s likely to have an exception
+    } catch (MonkeyLearnException e) { // it’s likely to have an exception
       e.printStackTrace();
     }
     return new ArrayList<>();
@@ -69,4 +69,3 @@ public class MonkeyLearnClient {
     return topKeywords;
   }
 }
-

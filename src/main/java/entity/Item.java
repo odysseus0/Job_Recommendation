@@ -21,12 +21,17 @@ public class Item {
 
   @JsonAlias({"id"})
   String itemId;
+
   @JsonAlias({"title"})
   String name;
+
   @JsonAlias({"location"})
   String address;
+
   Set<String> keywords = new HashSet<>();
+
   @JsonAlias({"company_logo"})
   String imageUrl;
+
   String url;
 }
