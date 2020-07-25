@@ -28,6 +28,7 @@ public class Item {
   @JsonAlias({"location"})
   String address;
 
+  @Builder.Default
   Set<String> keywords = new HashSet<>();
 
   @JsonAlias({"company_logo"})
