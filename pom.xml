@@ -84,6 +84,11 @@
       <groupId>commons-io</groupId>
       <version>2.7</version>
     </dependency>
+    <dependency>
+      <artifactId>guava</artifactId>
+      <groupId>com.google.guava</groupId>
+      <version>29.0-jre</version>
+    </dependency>
   </dependencies>
   <groupId>laiproject</groupId>
   <modelVersion>4.0.0</modelVersion>
