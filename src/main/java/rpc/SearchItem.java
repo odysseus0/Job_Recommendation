@@ -1,5 +1,6 @@
 package rpc;
 
+import static rpc.RpcHelper.validateLogin;
 import static rpc.RpcHelper.writeJsonNode;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -34,6 +35,9 @@ public class SearchItem extends HttpServlet {
   /** @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response) */
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
+    if (!validateLogin(request, response)) {
+      return;
+    }
     String userId = request.getParameter("user_id");
     double lat = Double.parseDouble(request.getParameter("lat"));
     double lon = Double.parseDouble(request.getParameter("lon"));

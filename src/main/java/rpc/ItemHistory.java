@@ -1,7 +1,7 @@
 package rpc;
 
 import static rpc.RpcHelper.parseFavoriteItem;
-import static rpc.RpcHelper.writeJsonNode;
+import static rpc.RpcHelper.validateLogin;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +16,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 @WebServlet(
     name = "ItemHistory",
@@ -24,6 +25,9 @@ public class ItemHistory extends HttpServlet {
 
   protected void doPost(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
+    if (!validateLogin(request, response)) {
+      return;
+    }
     // Parse the favorite item from the input
     JsonNode input = new ObjectMapper().readTree(request.getReader());
     String userId = input.get("user_id").textValue();
@@ -32,15 +36,14 @@ public class ItemHistory extends HttpServlet {
     MySQLConnection connection = new MySQLConnection();
     connection.setFavoriteItems(userId, item);
     connection.close();
-    writeSuccessMsg(response);
-  }
-
-  private void writeSuccessMsg(HttpServletResponse response) throws IOException {
-    writeJsonNode(response, JsonNodeFactory.instance.objectNode().put("result", "SUCCESS"));
+    RpcHelper.writeSuccessMsg(response);
   }
 
   protected void doGet(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
+    if (!validateLogin(request, response)) {
+      return;
+    }
     String userId = request.getParameter("user_id");
     MySQLConnection connection = new MySQLConnection();
     Set<Item> items = connection.getFavoriteItems(userId);
@@ -57,12 +60,17 @@ public class ItemHistory extends HttpServlet {
   @Override
   protected void doDelete(HttpServletRequest request, HttpServletResponse response)
       throws IOException {
+    HttpSession session = request.getSession(false);
+    if (session == null) {
+      response.setStatus(403);
+      return;
+    }
     MySQLConnection connection = new MySQLConnection();
     JsonNode input = new ObjectMapper().readTree(request.getReader());
-    String userId = input.get("user_id").textValue();
+    String userId = (String) session.getAttribute("user_id");
     Item item = parseFavoriteItem(input.get("favorite"));
     connection.unsetFavoriteItems(userId, item.getItemId());
     connection.close();
-    writeSuccessMsg(response);
+    RpcHelper.writeSuccessMsg(response);
   }
 }
